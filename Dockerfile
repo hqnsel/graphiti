@@ -13,14 +13,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install Poetry
 RUN pip install --no-cache-dir poetry==1.8.3
 
-# Copy only the files needed for installation
+# Copy files
 COPY ./pyproject.toml ./poetry.lock* ./README.md /app/
 COPY ./graphiti_core /app/graphiti_core
 COPY ./server/pyproject.toml ./server/poetry.lock* /app/server/
 
 RUN poetry config virtualenvs.create false
 
-# Install the local package
+# Install package
 RUN poetry build && pip install dist/*.whl
 
 # Install server dependencies
@@ -43,9 +43,9 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 WORKDIR /app
 COPY ./server /app
 
-# Set environment variables
+# Environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
 
-# Command to run the application
+# Run application
 CMD ["uvicorn", "graph_service.main:app", "--host", "0.0.0.0", "--port", "$PORT"]
